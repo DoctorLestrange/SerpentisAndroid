@@ -3,9 +3,13 @@ name: Serpentis Android CI
 on:
   push:
     branches: [ "main", "master" ]
+    tags: [ "v*" ]
   pull_request:
     branches: [ "main", "master" ]
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build-and-test:
@@ -16,13 +20,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
         with:
           distribution: "temurin"
-          java-version: "17"
+          java-version: "21"
 
-      - name: Setup Gradle
+      - name: Setup Gradle 9.3.1
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "9.3.1"
@@ -47,3 +51,21 @@ jobs:
         with:
           name: serpentis-debug-apk
           path: dist/serpentis.apk
+
+      - name: Publish APK to GitHub Releases
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v'))
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG_NAME="${GITHUB_REF_NAME}"
+          if [ "$GITHUB_REF_TYPE" = "branch" ]; then
+            TAG_NAME="latest"
+          fi
+          if gh release view "$TAG_NAME" >/dev/null 2>&1; then
+            gh release upload "$TAG_NAME" dist/serpentis.apk --clobber
+          else
+            gh release create "$TAG_NAME" dist/serpentis.apk \
+              --title "Serpentis ($TAG_NAME)" \
+              --notes "Automated Android APK build for Serpentis. Download \`serpentis.apk\` below to install on Android 7.0+ (API 24+)."
+          fi

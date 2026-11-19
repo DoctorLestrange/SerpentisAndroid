@@ -11,7 +11,7 @@ Thank you for your interest in contributing to **Serpentis**! This document outl
    git clone <your-repo-url>
    cd Serpentis
    ```
-2. **Open in Android Studio** (Ladybug / Meerkat or newer) or build from the command line with **JDK 17+**.
+2. **Open in Android Studio** (Ladybug / Meerkat or newer) or build from the command line with **JDK 21+**.
 
 ---
 

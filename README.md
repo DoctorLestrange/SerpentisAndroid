@@ -120,8 +120,8 @@ Serpentis/
 │   ├── build.gradle.kts
 │   └── proguard-rules.pro
 ├── dist/
-│   └── serpentis.apk                            # Pre-built installable Android APK
-├── .github/workflows/android-ci.yml             # GitHub Actions CI & APK artifact pipeline
+│   └── readme_dist.md                           # Pre-built APK download & local output directory
+├── .github/workflows/android-ci.yml             # GitHub Actions CI, Tests & Release APK pipeline
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
 ├── LICENSE
@@ -133,25 +133,30 @@ Serpentis/
 ## Building, Testing & Installing
 
 ### Prerequisites
-- **JDK 17+** (or Android Studio Ladybug / Meerkat+)
+- **JDK 21+** (required by Android SDK 36 & Robolectric 4.16.1) or Android Studio Ladybug / Meerkat+
 - **Android SDK** with API Level 36 (`minSdk = 24`, `targetSdk = 36`)
+- **Gradle 9.3.1**
+
+### Download Pre-Built APK (GitHub)
+Every push to `main` automatically runs all unit/Robolectric tests and publishes `serpentis.apk`:
+- **GitHub Releases**: Open the repository **Releases** page and download `serpentis.apk` from the `latest` release.
+- **GitHub Actions**: Open **Actions → Serpentis Android CI → Artifacts** and download `serpentis-debug-apk`.
 
 ### 1. Run Unit & Robolectric UI Tests
 ```bash
 gradle :app:testDebugUnitTest
 ```
 
-### 2. Build the Installable Debug APK
+### 2. Build the Installable Debug APK Locally
 ```bash
 gradle :app:assembleDebug
 ```
 The compiled APK is generated at:
 - `app/build/outputs/apk/debug/app-debug.apk`
-- Pre-packaged copy in the repository: `dist/serpentis.apk`
 
 ### 3. Install on a Connected Android Device
 ```bash
-adb install -r dist/serpentis.apk
+adb install -r serpentis.apk
 ```
 
 ---
