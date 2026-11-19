@@ -1,0 +1,32 @@
+# IntelliJ / Android Studio
+*.iml
+.idea/caches
+.idea/libraries
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+.idea/deploymentTargetDropDown.xml
+.idea/render.experimental.xml
+
+# Gradle & Kotlin build caches
+.gradle/
+.kotlin/
+build/
+app/build/
+.build-outputs/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Local environment & signing secrets
+local.properties
+/local.properties
+.env
+debug.keystore
+*.jks
+*.keystore
+
+# OS artifacts
+.DS_Store
+Thumbs.db

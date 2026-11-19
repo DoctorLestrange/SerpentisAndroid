@@ -1,0 +1,6 @@
+{
+  "name": "Serpentis",
+  "description": "A fast, customizable, feature-rich classic and tactical arcade Snake game with multiple arenas, Flux Magnet and power-ups, togglable Poison hazards, precision controls, synthesized audio, haptics, and run analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
