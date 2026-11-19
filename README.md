@@ -10,6 +10,27 @@
 
 ---
 
+## Screenshots
+
+<p align="center">
+  <table>
+    <tr>
+      <td align="center">
+        <img src="screenshots/screenshot_1.png" alt="Serpentis Arcade Home & Launcher" width="280" />
+        <br />
+        <sub><b>Arcade Home & Launcher</b> — Modes, Speed Tiers, Controls & Poison Toggle</sub>
+      </td>
+      <td align="center">
+        <img src="screenshots/screenshot_2.png" alt="Serpentis Live Gameplay Arena" width="280" />
+        <br />
+        <sub><b>Live Arena Gameplay</b> — Fixed-Height HUD, Wrap-Around Grid & Power-Ups</sub>
+      </td>
+    </tr>
+  </table>
+</p>
+
+---
+
 ## Key Features
 
 ### 1. Five Distinct Game Modes
@@ -121,6 +142,9 @@ Serpentis/
 │   └── proguard-rules.pro
 ├── dist/
 │   └── readme_dist.md                           # Pre-built APK download & local output directory
+├── screenshots/
+│   ├── screenshot_1.png                         # Arcade Home & Launcher preview
+│   └── screenshot_2.png                         # Live Arena Gameplay preview
 ├── .github/workflows/android-ci.yml             # GitHub Actions CI, Tests & Release APK pipeline
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
