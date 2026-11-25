@@ -4,26 +4,34 @@ All notable changes to **Serpentis** are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0] - 2026-11-18
+## [0.1.1] - 2026-11-25
 
 ### Added
-- **Complete Serpentis Arcade Release**:
+- **Multi-Theme App Interface Studio**:
+  - **Dark Graphite (New Default)**: Deep matte charcoal gray theme (`#121316` / `#1A1C20` / `#22252B`) with layered surface hierarchy.
+  - **Midnight Cyber**: Classic deep obsidian blue-navy arcade theme preserved as a selectable option.
+  - **Soft Light (Warm Off-White)**: Eye-friendly warm alabaster off-white theme (`#F2EFE9` / `#F7F5F0` / `#E9E5DC`) designed without harsh pure-white glare, complete with automatic light status/navigation bar icons.
+  - **Match Device (System Light/Dark)**: Follows your Android system theme mode automatically.
+- **Follow Device Theme Colors (Material You)**:
+  - Toggleable Android 12+ Material You dynamic color integration (`dynamicDarkColorScheme` / `dynamicLightColorScheme`) synced to your wallpaper, with automatic graceful fallback on older Android versions.
+- **Customizable Accent Color Palettes**:
+  - Choose from 6 calibrated dual-tone accent palettes (*Emerald & Cyan*, *Cobalt & Teal*, *Amber & Flame*, *Crimson & Rose*, *Violet & Orchid*, and *Monochrome Ink*), each fine-tuned separately for dark and soft-light contrast.
+- **Minimalist Light & Dark Play Arena Themes + Matching Serpent Skins**:
+  - **Soft Paper Play Theme**: Warm off-white playing area (`#F2EFE9`) auto-paired with the new **Charcoal Ink** black/slate-grey serpent, plus light-board calibrated food, skull, magnet, and countdown-ring contrast.
+  - **Graphite Matte Play Theme**: Dark charcoal grey playing area (`#24272C`) auto-paired with the new **Soft Ivory** warm off-white serpent.
+- **Automated Versioned GitHub Releases**:
+  - Dedicated `Release Serpentis APK` workflow (`.github/workflows/release.yml`) automatically reads `versionName` (`0.1.1`) from `app/build.gradle.kts`, runs tests, packages `serpentis-v0.1.1.apk`, extracts changelog notes, and publishes the **`v0.1.1`** GitHub Release.
+
+### Fixed
+- Prevented `"Overclocked"` speed tier chip text from breaking mid-word on narrow portrait screens.
+- Added high-contrast light-theme calibration for Home hero banner text, Arena active buff chips, and Workshop color swatch borders.
+
+## [0.1.0] - 2026-11-18
+
+### Added
+- **Initial Serpentis Arcade Release**:
   - **5 Game Modes**: *Classic Arena*, *Zen Flow*, *Labyrinth* (with 4 selectable sector layouts), *Portal Flux*, and *Time Blitz (120s)*.
   - **4 Speed Engine Tiers**: *Chill*, *Arcade*, *Hyper*, and *Overclocked* with optional dynamic speed scaling.
   - **Flux Magnet Power-Up (`FoodType.MAGNET_CORE`)**: Distinct horseshoe magnet orb (`🧲`) that activates a 4-tile Chebyshev attraction field for `55` ticks, pulling non-hazard items 1 tile closer toward the serpent's head each tick while strictly ignoring Poison Skulls.
-  - **Togglable Poison Skull Hazard (`FoodType.POISON_SKULL`)**:
-    - Distinct skull-and-crossbones hazard (`☠`) with a 45-tick countdown ring.
-    - Enforces at most 1 Poison Skull on the board at a time.
-    - Head-safe spawning (`manhattanDistance >= 5`, `chebyshevDistance >= 4`, and never in the 5 tiles directly ahead of the serpent's heading).
-    - Relocates to a different tile after expiring and causes instant game over on contact (`DeathReason.POISON_CONSUMED`) unless `PHASE_GHOST` is active.
-    - Enabled by default on *Hyper* and *Overclocked* tiers, and manually togglable on both the *Home* and *Settings* screens.
-  - **Power-Up Suite**: *Cyber Apple*, *Golden Core*, *Flux Magnet*, *Chrono Shard*, *Phase Ghost*, *2x Overdrive*, and *Nano Shrink*.
-  - **Full-Area Adaptive Play Grid**: Expands the play board to fill the entire rectangular space between the fixed-height HUD header and bottom controls with square cells.
-  - **Precision Gesture & Control Engine**:
-    - 2-step buffered turn queue preventing 180° double-input self-collisions.
-    - L-swipe gesture filtering (max 2 perpendicular turns per continuous gesture with cross-axis drift decay).
-    - Outer-margin swipe support across the entire play area outside the grid.
-    - Virtual D-Pad, Split Turn Paddles, Pure Swipe mode, and hardware keyboard (`WASD` / `Arrows` / `Space`) support.
-  - **Customization Workshop**: 6 Serpent skins, 4 Arena themes (including *Retro 1998 Nokia 3310 LCD*), and 4 base grid densities.
-  - **Procedural 16-Bit PCM Audio & Haptics**: Real-time waveform synthesis via `AudioTrack` and tactile feedback via `Vibrator`.
-  - **Offline Persistence**: Room SQLite database for leaderboards, career stats, 10 achievements, and automatic saved-run resume.
+  - **Togglable Poison Skull Hazard (`FoodType.POISON_SKULL`)**: Single-instance head-safe skull hazard (`☠`) with timed relocation, instant game over on contact (unless `PHASE_GHOST` is active), and default-on in *Hyper* & *Overclocked* tiers.
+  - **Full-Area Adaptive Play Grid**, **2-Step Buffered Turn Queue**, **L-Swipe Protection**, **Outer-Margin Swipe Controls**, **16-Bit PCM Procedural Audio**, **Haptics**, and **Room SQLite Persistence**.

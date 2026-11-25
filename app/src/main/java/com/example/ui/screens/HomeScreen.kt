@@ -52,6 +52,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -229,7 +230,9 @@ fun HomeScreen(
                         }
 
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .horizontalScroll(rememberScrollState()),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Difficulty.entries.forEach { diff ->
@@ -240,16 +243,16 @@ fun HomeScreen(
                                     label = {
                                         Text(
                                             text = diff.title,
-                                            style = MaterialTheme.typography.labelMedium
+                                            style = MaterialTheme.typography.labelMedium,
+                                            maxLines = 1,
+                                            softWrap = false
                                         )
                                     },
                                     colors = FilterChipDefaults.filterChipColors(
                                         selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
                                         selectedLabelColor = MaterialTheme.colorScheme.onSecondaryContainer
                                     ),
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .testTag("diff_chip_${diff.name.lowercase()}")
+                                    modifier = Modifier.testTag("diff_chip_${diff.name.lowercase()}")
                                 )
                             }
                         }
@@ -402,6 +405,9 @@ private fun HeroBannerCard(
                         )
                     )
             )
+            val bannerPrimary = lerp(MaterialTheme.colorScheme.primary, Color.White, 0.35f)
+            val bannerSecondary = lerp(MaterialTheme.colorScheme.secondary, Color.White, 0.42f)
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -410,18 +416,18 @@ private fun HeroBannerCard(
                 verticalAlignment = Alignment.Top
             ) {
                 Surface(
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                    color = Color(0x88121418),
                     shape = RoundedCornerShape(8.dp),
                     modifier = Modifier.border(
                         1.dp,
-                        MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
+                        bannerPrimary.copy(alpha = 0.7f),
                         RoundedCornerShape(8.dp)
                     )
                 ) {
                     Text(
                         text = "ARCADE EDITION",
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary,
+                        color = bannerPrimary,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                 }
@@ -431,13 +437,13 @@ private fun HeroBannerCard(
                     modifier = Modifier
                         .size(48.dp)
                         .clip(CircleShape)
-                        .background(Color(0x990F172A))
+                        .background(Color(0x99121418))
                         .testTag("open_manual_button")
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.HelpOutline,
                         contentDescription = stringResource(R.string.how_to_play),
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = bannerPrimary
                     )
                 }
             }
@@ -456,7 +462,7 @@ private fun HeroBannerCard(
                 Text(
                     text = stringResource(R.string.hero_subtitle),
                     style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.secondary
+                    color = bannerSecondary
                 )
             }
         }

@@ -1,8 +1,12 @@
 package com.example.ui.screens
 
+import android.os.Build
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,16 +20,20 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.Gamepad
 import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -33,15 +41,22 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.R
+import com.example.model.AppAccent
+import com.example.model.AppThemeMode
 import com.example.model.ControlScheme
 import com.example.model.GameSettings
 import kotlin.math.roundToInt
@@ -49,6 +64,9 @@ import kotlin.math.roundToInt
 @Composable
 fun SettingsScreen(
     settings: GameSettings,
+    onSelectAppThemeMode: (AppThemeMode) -> Unit,
+    onSelectAppAccent: (AppAccent) -> Unit,
+    onSetUseDynamicColors: (Boolean) -> Unit,
     onSelectControlScheme: (ControlScheme) -> Unit,
     onSetSwipeSensitivity: (Float) -> Unit,
     onSetDynamicSpeedScaling: (Boolean) -> Unit,
@@ -65,6 +83,14 @@ fun SettingsScreen(
 ) {
     BackHandler(onBack = onBack)
 
+    val systemDark = isSystemInDarkTheme()
+    val effectiveIsDark = when (settings.appThemeMode) {
+        AppThemeMode.DARK_GRAPHITE, AppThemeMode.MIDNIGHT_CYBER -> true
+        AppThemeMode.SOFT_LIGHT -> false
+        AppThemeMode.SYSTEM -> systemDark
+    }
+    val supportsDynamicColors = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.TopCenter
@@ -77,6 +103,125 @@ fun SettingsScreen(
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // 0. App Appearance & Device Theme Card
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                ),
+                shape = RoundedCornerShape(18.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Filled.ColorLens,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "APP THEME & ACCENT COLORS",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        AppThemeMode.entries.forEach { mode ->
+                            FilterChip(
+                                selected = settings.appThemeMode == mode,
+                                onClick = { onSelectAppThemeMode(mode) },
+                                label = {
+                                    Text(
+                                        text = mode.title,
+                                        maxLines = 1,
+                                        softWrap = false
+                                    )
+                                },
+                                modifier = Modifier.testTag("settings_theme_${mode.name.lowercase()}")
+                            )
+                        }
+                    }
+
+                    SettingsToggleRow(
+                        title = "Follow Device Theme Colors",
+                        subtitle = if (supportsDynamicColors) {
+                            "Match Material You dynamic colors from your device wallpaper"
+                        } else {
+                            "Available on Android 12+; uses your selected accent palette on older devices"
+                        },
+                        checked = settings.useDynamicColors,
+                        testTag = "toggle_dynamic_colors",
+                        onCheckedChange = onSetUseDynamicColors
+                    )
+
+                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Text(
+                            text = if (settings.useDynamicColors && supportsDynamicColors) {
+                                "Accent Color (Tap any swatch to customize)"
+                            } else {
+                                "Accent Color: ${settings.appAccent.title}"
+                            },
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .horizontalScroll(rememberScrollState()),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            AppAccent.entries.forEach { accent ->
+                                val swatchColor = if (effectiveIsDark) accent.darkPrimary else accent.lightPrimary
+                                val iconTint = if (effectiveIsDark) accent.darkOnPrimary else accent.lightOnPrimary
+                                val isSelected = !settings.useDynamicColors && settings.appAccent == accent
+                                Box(
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .minimumInteractiveComponentSize()
+                                        .clip(CircleShape)
+                                        .background(swatchColor)
+                                        .border(
+                                            width = if (isSelected) 3.dp else 1.dp,
+                                            color = if (isSelected) {
+                                                MaterialTheme.colorScheme.onSurface
+                                            } else {
+                                                MaterialTheme.colorScheme.outline
+                                            },
+                                            shape = CircleShape
+                                        )
+                                        .semantics {
+                                            role = Role.Button
+                                            contentDescription = "Accent ${accent.title}"
+                                        }
+                                        .clickable { onSelectAppAccent(accent) }
+                                        .testTag("settings_accent_${accent.name.lowercase()}"),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    if (isSelected) {
+                                        Icon(
+                                            imageVector = Icons.Filled.Check,
+                                            contentDescription = null,
+                                            tint = iconTint,
+                                            modifier = Modifier.size(22.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             // 1. Control Scheme Picker
             Row(
                 verticalAlignment = Alignment.CenterVertically,

@@ -73,9 +73,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            SerpentisTheme {
-                SerpentisApp()
-            }
+            SerpentisApp()
         }
     }
 }
@@ -158,11 +156,16 @@ fun SerpentisApp(
         runCatching { focusRequester.requestFocus() }
     }
 
-    BoxWithConstraints(
-        modifier = Modifier
-            .fillMaxSize()
-            .focusRequester(focusRequester)
-            .focusable()
+    SerpentisTheme(
+        themeMode = settings.appThemeMode,
+        accent = settings.appAccent,
+        useDynamicColors = settings.useDynamicColors
+    ) {
+        BoxWithConstraints(
+            modifier = Modifier
+                .fillMaxSize()
+                .focusRequester(focusRequester)
+                .focusable()
             .onPreviewKeyEvent { event ->
                 if (event.type == KeyEventType.KeyDown && currentDestination == AppDestination.ARENA) {
                     when (event.key) {
@@ -293,6 +296,9 @@ fun SerpentisApp(
                         )
                         AppDestination.WORKSHOP -> WorkshopScreen(
                             settings = settings,
+                            onSelectAppThemeMode = viewModel::setAppThemeMode,
+                            onSelectAppAccent = viewModel::setAppAccent,
+                            onSetUseDynamicColors = viewModel::setUseDynamicColors,
                             onSelectSkin = viewModel::setSnakeSkin,
                             onSelectArenaTheme = viewModel::setArenaTheme,
                             onSelectBoardSize = viewModel::setBoardSize,
@@ -310,6 +316,9 @@ fun SerpentisApp(
                         )
                         AppDestination.SETTINGS -> SettingsScreen(
                             settings = settings,
+                            onSelectAppThemeMode = viewModel::setAppThemeMode,
+                            onSelectAppAccent = viewModel::setAppAccent,
+                            onSetUseDynamicColors = viewModel::setUseDynamicColors,
                             onSelectControlScheme = viewModel::setControlScheme,
                             onSetSwipeSensitivity = viewModel::setSwipeSensitivity,
                             onSetDynamicSpeedScaling = viewModel::setDynamicSpeedScaling,
@@ -326,6 +335,7 @@ fun SerpentisApp(
                     }
                 }
             }
+        }
         }
     }
 }

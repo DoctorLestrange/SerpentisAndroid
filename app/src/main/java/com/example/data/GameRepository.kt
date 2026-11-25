@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.example.model.AchievementCatalog
 import com.example.model.ActiveBuff
+import com.example.model.AppAccent
+import com.example.model.AppThemeMode
 import com.example.model.ArenaTheme
 import com.example.model.BoardSize
 import com.example.model.ControlScheme
@@ -238,12 +240,18 @@ class GameRepository(
         val controlScheme = prefs.getString("controlScheme", null)?.let {
             runCatching { ControlScheme.valueOf(it) }.getOrNull()
         } ?: ControlScheme.DPAD
+        val appThemeMode = prefs.getString("appThemeMode", null)?.let {
+            runCatching { AppThemeMode.valueOf(it) }.getOrNull()
+        } ?: AppThemeMode.DARK_GRAPHITE
+        val appAccent = prefs.getString("appAccent", null)?.let {
+            runCatching { AppAccent.valueOf(it) }.getOrNull()
+        } ?: AppAccent.EMERALD_CYAN
         val snakeSkin = prefs.getString("snakeSkin", null)?.let {
             runCatching { SnakeSkin.valueOf(it) }.getOrNull()
         } ?: SnakeSkin.CYBER_EMERALD
         val arenaTheme = prefs.getString("arenaTheme", null)?.let {
             runCatching { ArenaTheme.valueOf(it) }.getOrNull()
-        } ?: ArenaTheme.OBSIDIAN_GRID
+        } ?: ArenaTheme.GRAPHITE_MINIMAL
         val labyrinthLayout = prefs.getString("labyrinthLayout", null)?.let {
             runCatching { LabyrinthLayout.valueOf(it) }.getOrNull()
         } ?: LabyrinthLayout.CROSSHAIR_PILLARS
@@ -255,6 +263,9 @@ class GameRepository(
             fullAreaGrid = prefs.getBoolean("fullAreaGrid", false),
             poisonEnabled = prefs.getBoolean("poisonEnabled", difficulty.defaultPoisonEnabled),
             controlScheme = controlScheme,
+            appThemeMode = appThemeMode,
+            appAccent = appAccent,
+            useDynamicColors = prefs.getBoolean("useDynamicColors", false),
             snakeSkin = snakeSkin,
             arenaTheme = arenaTheme,
             labyrinthLayout = labyrinthLayout,
@@ -275,6 +286,9 @@ class GameRepository(
             .putBoolean("fullAreaGrid", s.fullAreaGrid)
             .putBoolean("poisonEnabled", s.poisonEnabled)
             .putString("controlScheme", s.controlScheme.name)
+            .putString("appThemeMode", s.appThemeMode.name)
+            .putString("appAccent", s.appAccent.name)
+            .putBoolean("useDynamicColors", s.useDynamicColors)
             .putString("snakeSkin", s.snakeSkin.name)
             .putString("arenaTheme", s.arenaTheme.name)
             .putString("labyrinthLayout", s.labyrinthLayout.name)

@@ -165,10 +165,10 @@ fun SnakeBoardCanvas(
                 // 5. Draw Food, Magnet Power-Up & Poison Skull Hazard
                 for (food in gameState.foods) {
                     val center = Offset((food.position.x + 0.5f) * cellW, (food.position.y + 0.5f) * cellH)
-                    val fColor = if (arenaTheme.isRetroLcd) {
-                        Color(0xFF0F380F)
-                    } else {
-                        food.type.color
+                    val fColor = when {
+                        arenaTheme.isRetroLcd -> Color(0xFF0F380F)
+                        arenaTheme.isLightBoard -> lightBoardFoodColor(food.type)
+                        else -> food.type.color
                     }
 
                     when (food.type) {
@@ -177,6 +177,7 @@ fun SnakeBoardCanvas(
                                 center = center,
                                 cellMin = cellMin,
                                 isRetroLcd = arenaTheme.isRetroLcd,
+                                isLightBoard = arenaTheme.isLightBoard,
                                 boardBg = arenaTheme.boardBgStart
                             )
                         }
@@ -184,13 +185,14 @@ fun SnakeBoardCanvas(
                             drawMagnetOrb(
                                 center = center,
                                 cellMin = cellMin,
-                                isRetroLcd = arenaTheme.isRetroLcd
+                                isRetroLcd = arenaTheme.isRetroLcd,
+                                isLightBoard = arenaTheme.isLightBoard
                             )
                         }
                         FoodType.PHASE_GHOST, FoodType.CHRONO_SHARD -> {
                             if (!arenaTheme.isRetroLcd) {
                                 drawCircle(
-                                    color = fColor.copy(alpha = 0.25f),
+                                    color = fColor.copy(alpha = if (arenaTheme.isLightBoard) 0.16f else 0.25f),
                                     radius = cellMin * 0.48f,
                                     center = center
                                 )
@@ -215,14 +217,14 @@ fun SnakeBoardCanvas(
                         FoodType.GOLDEN_CORE -> {
                             if (!arenaTheme.isRetroLcd) {
                                 drawCircle(
-                                    color = fColor.copy(alpha = 0.25f),
+                                    color = fColor.copy(alpha = if (arenaTheme.isLightBoard) 0.18f else 0.25f),
                                     radius = cellMin * 0.48f,
                                     center = center
                                 )
                             }
                             drawCircle(color = fColor, radius = cellMin * 0.36f, center = center)
                             drawCircle(
-                                color = Color.White,
+                                color = if (arenaTheme.isLightBoard) Color(0xFFFFF8E1) else Color.White,
                                 radius = cellMin * 0.20f,
                                 center = center,
                                 style = Stroke(width = cellMin * 0.06f)
@@ -231,7 +233,7 @@ fun SnakeBoardCanvas(
                         else -> {
                             if (!arenaTheme.isRetroLcd) {
                                 drawCircle(
-                                    color = fColor.copy(alpha = 0.25f),
+                                    color = fColor.copy(alpha = if (arenaTheme.isLightBoard) 0.16f else 0.25f),
                                     radius = cellMin * 0.48f,
                                     center = center
                                 )
@@ -253,10 +255,11 @@ fun SnakeBoardCanvas(
 
                     if (food.expiresAtTick != null) {
                         val rem = food.remainingFraction(gameState.currentTick)
-                        val arcColor = if (food.type == FoodType.POISON_SKULL && !arenaTheme.isRetroLcd) {
-                            Color(0xFFFF1744).copy(alpha = 0.88f)
-                        } else {
-                            Color.White.copy(alpha = 0.85f)
+                        val arcColor = when {
+                            food.type == FoodType.POISON_SKULL && !arenaTheme.isRetroLcd ->
+                                if (arenaTheme.isLightBoard) Color(0xFFD90429).copy(alpha = 0.90f) else Color(0xFFFF1744).copy(alpha = 0.88f)
+                            arenaTheme.isLightBoard -> Color(0xFF1F2329).copy(alpha = 0.78f)
+                            else -> Color.White.copy(alpha = 0.85f)
                         }
                         drawArc(
                             color = arcColor,
@@ -310,9 +313,13 @@ fun SnakeBoardCanvas(
                 if (gameState.isMagnetActive && drawCoords.isNotEmpty()) {
                     val headPos = drawCoords[0]
                     val headCenter = Offset((headPos.x + 0.5f) * cellW, (headPos.y + 0.5f) * cellH)
-                    val magnetColor = if (arenaTheme.isRetroLcd) Color(0xFF0F380F) else Color(0xFF38BDF8)
+                    val magnetColor = when {
+                        arenaTheme.isRetroLcd -> Color(0xFF0F380F)
+                        arenaTheme.isLightBoard -> Color(0xFF0284C7)
+                        else -> Color(0xFF38BDF8)
+                    }
                     drawCircle(
-                        color = magnetColor.copy(alpha = 0.22f),
+                        color = magnetColor.copy(alpha = if (arenaTheme.isLightBoard) 0.28f else 0.22f),
                         radius = cellMin * 3.8f,
                         center = headCenter,
                         style = Stroke(
@@ -321,7 +328,7 @@ fun SnakeBoardCanvas(
                         )
                     )
                     drawCircle(
-                        color = magnetColor.copy(alpha = 0.45f),
+                        color = magnetColor.copy(alpha = 0.50f),
                         radius = cellMin * 0.74f,
                         center = headCenter,
                         style = Stroke(width = (cellMin * 0.07f).coerceAtLeast(1.5f))
@@ -400,8 +407,9 @@ fun SnakeBoardCanvas(
                     val corner = if (arenaTheme.isRetroLcd) cellMin * 0.08f else cellMin * 0.32f
 
                     if (isHead && !arenaTheme.isRetroLcd) {
+                        val glowAlpha = if (arenaTheme.isLightBoard) 0.14f else 0.25f
                         drawCircle(
-                            color = skin.glowColor.copy(alpha = 0.25f * snakeAlpha),
+                            color = skin.glowColor.copy(alpha = glowAlpha * snakeAlpha),
                             radius = cellMin * 0.58f,
                             center = Offset((drawPos.x + 0.5f) * cellW, (drawPos.y + 0.5f) * cellH)
                         )
@@ -445,20 +453,44 @@ fun SnakeBoardCanvas(
     }
 }
 
+private fun lightBoardFoodColor(type: FoodType): Color = when (type) {
+    FoodType.CYBER_APPLE -> Color(0xFFD91E48)
+    FoodType.GOLDEN_CORE -> Color(0xFFD97706)
+    FoodType.CHRONO_SHARD -> Color(0xFF0284C7)
+    FoodType.PHASE_GHOST -> Color(0xFF7C3AED)
+    FoodType.SCORE_OVERDRIVE -> Color(0xFF059669)
+    FoodType.MAGNET_CORE -> Color(0xFF0284C7)
+    FoodType.SHRINK_CAPSULE -> Color(0xFFEA580C)
+    FoodType.POISON_SKULL -> Color(0xFF23262B)
+}
+
 private fun DrawScope.drawPoisonSkull(
     center: Offset,
     cellMin: Float,
     isRetroLcd: Boolean,
+    isLightBoard: Boolean,
     boardBg: Color
 ) {
-    val skullColor = if (isRetroLcd) Color(0xFF0F380F) else Color(0xFFD9F99D)
-    val hazardGlow = if (isRetroLcd) Color(0xFF306230) else Color(0xFFFF1744)
-    val socketColor = if (isRetroLcd) boardBg else Color(0xFF1F0910)
+    val skullColor = when {
+        isRetroLcd -> Color(0xFF0F380F)
+        isLightBoard -> Color(0xFF23262B)
+        else -> Color(0xFFD9F99D)
+    }
+    val hazardGlow = when {
+        isRetroLcd -> Color(0xFF306230)
+        isLightBoard -> Color(0xFFD90429)
+        else -> Color(0xFFFF1744)
+    }
+    val socketColor = when {
+        isRetroLcd -> boardBg
+        isLightBoard -> Color(0xFFF2EFE9)
+        else -> Color(0xFF1F0910)
+    }
 
     if (!isRetroLcd) {
         // Danger aura behind skull
         drawCircle(
-            color = hazardGlow.copy(alpha = 0.26f),
+            color = hazardGlow.copy(alpha = if (isLightBoard) 0.16f else 0.26f),
             radius = cellMin * 0.48f,
             center = center
         )
@@ -538,16 +570,29 @@ private fun DrawScope.drawPoisonSkull(
 private fun DrawScope.drawMagnetOrb(
     center: Offset,
     cellMin: Float,
-    isRetroLcd: Boolean
+    isRetroLcd: Boolean,
+    isLightBoard: Boolean
 ) {
-    val fieldColor = if (isRetroLcd) Color(0xFF0F380F) else Color(0xFF38BDF8)
-    val archColor = if (isRetroLcd) Color(0xFF0F380F) else Color(0xFF0284C7)
-    val poleRed = if (isRetroLcd) Color(0xFF0F380F) else Color(0xFFFF2A6D)
-    val poleWhite = Color.White
+    val fieldColor = when {
+        isRetroLcd -> Color(0xFF0F380F)
+        isLightBoard -> Color(0xFF0284C7)
+        else -> Color(0xFF38BDF8)
+    }
+    val archColor = when {
+        isRetroLcd -> Color(0xFF0F380F)
+        isLightBoard -> Color(0xFF0369A1)
+        else -> Color(0xFF0284C7)
+    }
+    val poleRed = when {
+        isRetroLcd -> Color(0xFF0F380F)
+        isLightBoard -> Color(0xFFD91E48)
+        else -> Color(0xFFFF2A6D)
+    }
+    val poleTip = if (isLightBoard) Color(0xFF334155) else Color.White
 
     if (!isRetroLcd) {
         drawCircle(
-            color = fieldColor.copy(alpha = 0.26f),
+            color = fieldColor.copy(alpha = if (isLightBoard) 0.16f else 0.26f),
             radius = cellMin * 0.48f,
             center = center
         )
@@ -590,14 +635,14 @@ private fun DrawScope.drawMagnetOrb(
     if (!isRetroLcd) {
         val tipHeight = cellMin * 0.07f
         drawLine(
-            color = poleWhite,
+            color = poleTip,
             start = Offset(center.x - uRadius, armTopY),
             end = Offset(center.x - uRadius, armTopY + tipHeight),
             strokeWidth = strokeW,
             cap = StrokeCap.Square
         )
         drawLine(
-            color = poleWhite,
+            color = poleTip,
             start = Offset(center.x + uRadius, armTopY),
             end = Offset(center.x + uRadius, armTopY + tipHeight),
             strokeWidth = strokeW,

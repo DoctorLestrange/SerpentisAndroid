@@ -48,6 +48,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.onSizeChanged
@@ -591,12 +593,19 @@ private fun CompactBuffChip(
     buff: ActiveBuff,
     modifier: Modifier = Modifier
 ) {
+    val isLightSurface = MaterialTheme.colorScheme.surface.luminance() > 0.5f
+    val chipTint = if (isLightSurface) {
+        lerp(buff.type.color, Color(0xFF14161A), 0.42f)
+    } else {
+        buff.type.color
+    }
+
     Row(
         modifier = modifier
             .height(24.dp)
             .clip(RoundedCornerShape(6.dp))
-            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f))
-            .border(1.dp, buff.type.color.copy(alpha = 0.6f), RoundedCornerShape(6.dp))
+            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.85f))
+            .border(1.dp, chipTint.copy(alpha = 0.65f), RoundedCornerShape(6.dp))
             .padding(horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(6.dp)
@@ -604,7 +613,7 @@ private fun CompactBuffChip(
         Text(
             text = "${buff.type.symbol} ${buff.type.title}",
             style = MaterialTheme.typography.labelSmall,
-            color = buff.type.color,
+            color = chipTint,
             fontWeight = FontWeight.Bold,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -616,7 +625,7 @@ private fun CompactBuffChip(
                 .width(36.dp)
                 .height(4.dp)
                 .clip(RoundedCornerShape(2.dp)),
-            color = buff.type.color,
+            color = chipTint,
             trackColor = MaterialTheme.colorScheme.surfaceVariant
         )
         Text(

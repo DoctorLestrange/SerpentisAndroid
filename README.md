@@ -1,6 +1,7 @@
 # Serpentis — Precision Tactical Arcade Snake for Android
 
-![Platform](https://img.shields.io/badge/Platform-Android%207.0%2B%20(API%2024%2B)-00F59B?style=for-the-badge&logo=android&logoColor=white)
+![Release](https://img.shields.io/badge/Release-v0.1.1-00F59B?style=for-the-badge)
+![Platform](https://img.shields.io/badge/Platform-Android%207.0%2B%20(API%2024%2B)-00C853?style=for-the-badge&logo=android&logoColor=white)
 ![Language](https://img.shields.io/badge/Kotlin-2.0%2B-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white)
 ![UI](https://img.shields.io/badge/Jetpack%20Compose-Material%203-00E5FF?style=for-the-badge&logo=jetpackcompose&logoColor=white)
 ![Storage](https://img.shields.io/badge/Persistence-Room%20SQLite-FFB800?style=for-the-badge&logo=sqlite&logoColor=white)
@@ -83,10 +84,16 @@
 
 ---
 
-### 5. Full-Area Adaptive Play Grid & Customization Workshop
+### 5. Full-Area Adaptive Play Grid, App Themes & Customization Workshop
+- **App Interface Themes**:
+  - **Dark Graphite** *(Default)*: Matte neutral charcoal-gray surfaces designed for crisp, distraction-free focus.
+  - **Midnight Cyber**: Classic deep obsidian-navy theme with neon blue-green highlights.
+  - **Soft Light**: Warm off-white paper surfaces (`#F2EFE9` / `#F7F5F0`, zero harsh pure-white glare) engineered for daytime comfort.
+  - **Match Device & Material You**: Automatically follow the device's system light/dark mode and optionally sync with Android 12+ Material You dynamic wallpaper colors.
+- **6 Customizable Accent Palettes**: *Emerald Cyan* (default), *Cobalt Teal*, *Amber Gold*, *Crimson Coral*, *Violet Orchid*, and *Monochrome Slate* — each independently calibrated for contrast on both Dark and Soft Light themes.
+- **6 Play Arena Themes**: *Graphite Matte* (dark charcoal board auto-paired with a warm off-white snake), *Soft Paper* (warm off-white board auto-paired with a black/slate-gray snake), *Obsidian Grid*, *Retro 1998 LCD (Nokia 3310 pixel matrix)*, *Synthwave Dusk*, and *Carbon Tactical*.
+- **8 Serpent Skins**: *Soft Ivory*, *Charcoal Ink*, *Cyber Emerald*, *Solar Flare*, *Plasma Violet*, *Glacier Frost*, *Matrix 3310*, and *Imperial Gold*.
 - **Full-Area Play Grid Mode**: Dynamically computes rectangular grid dimensions (`cols × rows`) from the measured play area so square cells fill the entire space between the fixed-height HUD header and bottom controls without ever shifting when status buffs appear.
-- **6 Serpent Skins**: *Cyber Emerald (Signature Serpentis)*, *Solar Flare*, *Plasma Violet*, *Glacier Frost*, *Matrix 3310*, and *Imperial Gold*.
-- **4 Arena Themes**: *Obsidian Grid*, *Retro 1998 LCD (Nokia 3310 pixel matrix)*, *Synthwave Dusk*, and *Carbon Tactical*.
 - **4 Base Grid Densities**: *Compact (15×15)*, *Standard (20×20)*, *Wide (24×24)*, and *Ultra (28×28)*.
 
 ---
@@ -128,16 +135,16 @@ Serpentis/
 │   │   │   │   │   │   ├── RecordsScreen.kt     # Leaderboards, career telemetry & achievements
 │   │   │   │   │   │   └── SettingsScreen.kt    # Controls, sensitivity, audio, haptics & reset
 │   │   │   │   │   ├── theme/
-│   │   │   │   │   │   ├── Color.kt             # Serpentis neon & retro color palettes
-│   │   │   │   │   │   ├── Theme.kt             # Material 3 dark color scheme
+│   │   │   │   │   │   ├── Color.kt             # Graphite, Midnight Cyber & Soft Off-White palettes
+│   │   │   │   │   │   ├── Theme.kt             # Dynamic M3 Dark/Light + Material You color schemes
 │   │   │   │   │   │   └── Type.kt              # Orbitron, Space Grotesk & JetBrains Mono fonts
 │   │   │   │   │   └── GameViewModel.kt         # Coroutine game loop, state flows & coordination
 │   │   │   │   └── MainActivity.kt              # Edge-to-edge host, keyboard handler & adaptive nav
 │   │   │   ├── res/                             # Adaptive launcher icons, fonts, strings & XML rules
 │   │   │   └── AndroidManifest.xml
 │   │   └── test/java/com/example/
-│   │       ├── ExampleUnitTest.kt               # Deterministic engine, Magnet & Poison unit tests
-│   │       └── ExampleRobolectricTest.kt        # Compose UI navigation & toggle Robolectric tests
+│   │       ├── ExampleUnitTest.kt               # Engine, Magnet, Poison & Theme unit tests
+│   │       └── ExampleRobolectricTest.kt        # Compose UI navigation, theme & toggle tests
 │   ├── build.gradle.kts
 │   └── proguard-rules.pro
 ├── dist/
@@ -145,7 +152,9 @@ Serpentis/
 ├── screenshots/
 │   ├── screenshot_1.png                         # Arcade Home & Launcher preview
 │   └── screenshot_2.png                         # Live Arena Gameplay preview
-├── .github/workflows/android-ci.yml             # GitHub Actions CI, Tests & Release APK pipeline
+├── .github/workflows/
+│   ├── android-ci.yml                           # GitHub Actions CI & test verification
+│   └── release.yml                              # Automated versioned APK release (e.g. v0.1.1)
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
 ├── LICENSE
@@ -161,10 +170,10 @@ Serpentis/
 - **Android SDK** with API Level 36 (`minSdk = 24`, `targetSdk = 36`)
 - **Gradle 9.3.1**
 
-### Download Pre-Built APK (GitHub)
-Every push to `main` automatically runs all unit/Robolectric tests and publishes `serpentis.apk`:
-- **GitHub Releases**: Open the repository **Releases** page and download `serpentis.apk` from the `latest` release.
-- **GitHub Actions**: Open **Actions → Serpentis Android CI → Artifacts** and download `serpentis-debug-apk`.
+### Download Pre-Built APK & Automated Releases (GitHub)
+- **GitHub Releases (`v0.1.1`)**: Open the repository **Releases** page and download `serpentis-v0.1.1.apk`.
+- **Publishing a Versioned Release**: Go to **Actions → Release Serpentis APK → Run workflow** (or push a version tag like `git tag v0.1.1 && git push origin v0.1.1`). The workflow automatically reads `versionName` from `app/build.gradle.kts`, runs all unit & Robolectric tests, builds `serpentis-v0.1.1.apk`, extracts release notes from `CHANGELOG.md`, and publishes the versioned **`v0.1.1`** release in GitHub Releases.
+- **CI Build Artifacts**: Every push and pull request runs **Actions → Serpentis Android CI** and uploads the latest verified APK artifact.
 
 ### 1. Run Unit & Robolectric UI Tests
 ```bash

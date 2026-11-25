@@ -1,7 +1,11 @@
 package com.example
 
+import androidx.compose.ui.graphics.Color
 import com.example.engine.SnakeGameEngine
 import com.example.model.ActiveBuff
+import com.example.model.AppAccent
+import com.example.model.AppThemeMode
+import com.example.model.ArenaTheme
 import com.example.model.DeathReason
 import com.example.model.Difficulty
 import com.example.model.Direction
@@ -11,7 +15,9 @@ import com.example.model.GameSettings
 import com.example.model.GameStatus
 import com.example.model.GridPoint
 import com.example.model.PortalPair
+import com.example.model.SnakeSkin
 import com.example.model.SpawnedFood
+import com.example.ui.theme.buildSerpentisColorScheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
@@ -323,5 +329,57 @@ class ExampleUnitTest {
         val afterGhostStep = engine.stepTick(ghostState, settings).state
         assertEquals(GameStatus.RUNNING, afterGhostStep.status)
         assertEquals(DeathReason.NONE, afterGhostStep.deathReason)
+    }
+
+    @Test
+    fun `default theme settings use Dark Graphite app theme and Graphite Matte play board`() {
+        val defaults = GameSettings()
+        assertEquals(AppThemeMode.DARK_GRAPHITE, defaults.appThemeMode)
+        assertEquals(AppAccent.EMERALD_CYAN, defaults.appAccent)
+        assertFalse(defaults.useDynamicColors)
+        assertEquals(ArenaTheme.GRAPHITE_MINIMAL, defaults.arenaTheme)
+    }
+
+    @Test
+    fun `soft light theme uses eye-friendly off-white surfaces rather than pure white`() {
+        for (accent in AppAccent.entries) {
+            val (lightScheme, isDark) = buildSerpentisColorScheme(
+                themeMode = AppThemeMode.SOFT_LIGHT,
+                accent = accent,
+                systemInDarkTheme = true
+            )
+            assertFalse("SOFT_LIGHT must always resolve to light mode", isDark)
+            assertNotEquals("Light background must be off-white, not pure #FFFFFF", Color.White, lightScheme.background)
+            assertNotEquals("Light surface must be off-white, not pure #FFFFFF", Color.White, lightScheme.surface)
+            assertEquals(accent.lightPrimary, lightScheme.primary)
+            assertEquals(accent.lightSecondary, lightScheme.secondary)
+        }
+
+        // SYSTEM mode follows device dark/light preference
+        val (_, systemDarkResult) = buildSerpentisColorScheme(AppThemeMode.SYSTEM, AppAccent.COBALT_TEAL, systemInDarkTheme = true)
+        val (systemLightScheme, systemLightResult) = buildSerpentisColorScheme(AppThemeMode.SYSTEM, AppAccent.COBALT_TEAL, systemInDarkTheme = false)
+        assertTrue(systemDarkResult)
+        assertFalse(systemLightResult)
+        assertNotEquals(Color.White, systemLightScheme.background)
+
+        // DARK_GRAPHITE and MIDNIGHT_CYBER have distinct dark surfaces
+        val (graphiteScheme, graphiteDark) = buildSerpentisColorScheme(AppThemeMode.DARK_GRAPHITE, AppAccent.EMERALD_CYAN, systemInDarkTheme = false)
+        val (cyberScheme, cyberDark) = buildSerpentisColorScheme(AppThemeMode.MIDNIGHT_CYBER, AppAccent.EMERALD_CYAN, systemInDarkTheme = false)
+        assertTrue(graphiteDark)
+        assertTrue(cyberDark)
+        assertNotEquals(graphiteScheme.background, cyberScheme.background)
+    }
+
+    @Test
+    fun `minimalist light and dark play themes auto-pair matching high-contrast skins and avoid pure white`() {
+        val paper = ArenaTheme.PAPER_MINIMAL
+        assertTrue(paper.isLightBoard)
+        assertEquals(SnakeSkin.INK_CHARCOAL, paper.recommendedSkin)
+        assertNotEquals("Off-white board must not use pure #FFFFFF", Color.White, paper.boardBgStart)
+        assertNotEquals("Off-white board gradient must not use pure #FFFFFF", Color.White, paper.boardBgEnd)
+
+        val graphite = ArenaTheme.GRAPHITE_MINIMAL
+        assertFalse(graphite.isLightBoard)
+        assertEquals(SnakeSkin.IVORY_CHALK, graphite.recommendedSkin)
     }
 }

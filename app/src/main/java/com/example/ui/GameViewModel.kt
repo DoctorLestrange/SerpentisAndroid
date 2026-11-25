@@ -11,6 +11,8 @@ import com.example.data.SavedGameEntity
 import com.example.engine.ArcadeFeedbackManager
 import com.example.engine.GameEvent
 import com.example.engine.SnakeGameEngine
+import com.example.model.AppAccent
+import com.example.model.AppThemeMode
 import com.example.model.ArenaTheme
 import com.example.model.BoardSize
 import com.example.model.ControlScheme
@@ -486,12 +488,40 @@ class GameViewModel(
         repository.updateSettings { it.copy(controlScheme = scheme) }
     }
 
+    fun setAppThemeMode(mode: AppThemeMode) {
+        repository.updateSettings { it.copy(appThemeMode = mode) }
+    }
+
+    fun setAppAccent(accent: AppAccent) {
+        repository.updateSettings {
+            it.copy(
+                appAccent = accent,
+                useDynamicColors = false
+            )
+        }
+    }
+
+    fun setUseDynamicColors(enabled: Boolean) {
+        repository.updateSettings { it.copy(useDynamicColors = enabled) }
+    }
+
     fun setSnakeSkin(skin: SnakeSkin) {
         repository.updateSettings { it.copy(snakeSkin = skin) }
     }
 
     fun setArenaTheme(theme: ArenaTheme) {
-        repository.updateSettings { it.copy(arenaTheme = theme) }
+        repository.updateSettings { current ->
+            val pairedSkin = when {
+                theme.recommendedSkin != null -> theme.recommendedSkin
+                !theme.isLightBoard && !theme.isRetroLcd && current.snakeSkin == SnakeSkin.INK_CHARCOAL ->
+                    SnakeSkin.CYBER_EMERALD
+                else -> current.snakeSkin
+            }
+            current.copy(
+                arenaTheme = theme,
+                snakeSkin = pairedSkin
+            )
+        }
     }
 
     fun setDynamicSpeedScaling(enabled: Boolean) {

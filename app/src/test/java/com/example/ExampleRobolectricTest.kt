@@ -66,8 +66,63 @@ class ExampleRobolectricTest {
 
         // Navigate to Arena tab and verify board canvas and HUD full-area button are displayed
         composeTestRule.onNodeWithTag("nav_tab_arena").performClick()
+        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithTag("snake_board_canvas").assertIsDisplayed()
         composeTestRule.onNodeWithTag("hud_full_area_button").assertIsDisplayed().performClick()
         composeTestRule.onNodeWithTag("arena_swipe_region").assertIsDisplayed()
+    }
+
+    @Test
+    fun `switch app themes, custom accents, device colors, and minimalist light or dark play boards`() {
+        // Open Workshop and test App Interface Themes (Soft Light, Midnight Cyber, Dark Graphite)
+        composeTestRule.onNodeWithTag("nav_tab_workshop").performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag("app_theme_soft_light")
+            .performScrollTo()
+            .assertIsDisplayed()
+            .performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag("accent_card_cobalt_teal")
+            .performScrollTo()
+            .assertIsDisplayed()
+            .performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag("workshop_dynamic_colors_toggle")
+            .performScrollTo()
+            .assertIsDisplayed()
+            .performClick()
+        composeTestRule.waitForIdle()
+
+        // Switch between Soft Paper (off-white board) and Graphite Matte (dark gray board)
+        composeTestRule.onNodeWithTag("theme_card_paper_minimal")
+            .performScrollTo()
+            .assertIsDisplayed()
+            .performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag("theme_card_graphite_minimal")
+            .performScrollTo()
+            .assertIsDisplayed()
+            .performClick()
+        composeTestRule.waitForIdle()
+
+        // Open Settings and verify quick theme & dynamic color controls
+        composeTestRule.onNodeWithTag("nav_tab_settings").performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag("settings_theme_midnight_cyber")
+            .performScrollTo()
+            .assertIsDisplayed()
+            .performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag("toggle_dynamic_colors")
+            .performScrollTo()
+            .assertIsDisplayed()
+            .performClick()
+        composeTestRule.waitForIdle()
     }
 }
